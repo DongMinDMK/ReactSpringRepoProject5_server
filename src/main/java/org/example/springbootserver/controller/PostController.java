@@ -1,15 +1,20 @@
 package org.example.springbootserver.controller;
 
+import jakarta.servlet.ServletContext;
 import org.example.springbootserver.entity.Images;
 import org.example.springbootserver.entity.Likes;
+import org.example.springbootserver.entity.Post;
 import org.example.springbootserver.entity.Reply;
 import org.example.springbootserver.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashMap;
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
 import java.util.List;
-import java.util.Objects;
 
 @RestController
 @RequestMapping("/posts")
@@ -19,10 +24,10 @@ public class PostController {
     private PostService postService;
 
     @GetMapping("/getPostList")
-    public HashMap<String, Object> getPostList(){
+    public HashMap<String, Object> getPostList(@RequestParam(value="word", required = false) String word){
         HashMap<String, Object> hm = new HashMap<>();
 
-        hm.put("postList", postService.getPostList());
+        hm.put("postList", postService.getPostList(word));
 
         return hm;
     }
@@ -87,6 +92,67 @@ public class PostController {
         postService.deleteReply(id);
 
         hm.put("message", "OK");
+
+        return hm;
+    }
+
+    @Autowired
+    ServletContext context;
+    @PostMapping("/imgup")
+    public HashMap<String, Object> imgup(@RequestParam("image") MultipartFile file){
+        HashMap<String, Object> result = new HashMap<String, Object>();
+        String path = context.getRealPath("/uploads");
+        Calendar today = Calendar.getInstance();
+        long dt = today.getTimeInMillis();
+        String filename = file.getOriginalFilename();
+        String fn1 = filename.substring(0, filename.indexOf(".") );
+        String fn2 = filename.substring(filename.indexOf(".") );
+        String uploadPath = path + "/" + fn1 + dt + fn2;
+        try {
+            file.transferTo( new File(uploadPath) );
+            result.put("savefilename", fn1 + dt + fn2);
+        } catch (IllegalStateException | IOException e) {e.printStackTrace();}
+        return result;
+
+    }
+
+    @PostMapping("/insertPost")
+    public HashMap<String, Object> insertPost(@RequestBody Post post){
+        HashMap<String, Object> hm = new HashMap<>();
+
+        int postid = postService.insertPost(post);
+
+        hm.put("id", postid);
+
+        return hm;
+    }
+
+    @PostMapping("/insertImages")
+    public HashMap<String, Object> insertImages(@RequestBody Images images){
+        HashMap<String, Object> hm = new HashMap<>();
+
+        postService.insertImages(images);
+
+        hm.put("message", "OK");
+
+        return hm;
+    }
+
+    @GetMapping("/getMyPost")
+    public HashMap<String, Object> getMyPost(@RequestParam("writer") String writer){
+        HashMap<String, Object> hm = new HashMap<>();
+
+       List<Post> list = postService.getPostListByNickname(writer);
+       List<String> imgList = new ArrayList<>();
+
+       for(Post p : list){
+           List<Images> imgl = postService.getImgListByPostid(p.getId());
+           String imgName = imgl.get(0).getSavefilename();
+           imgList.add(imgName);
+       }
+
+       hm.put("postList", list);
+       hm.put("imgList", imgList);
 
         return hm;
     }
