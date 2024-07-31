@@ -212,4 +212,14 @@ public class MemberController {
 
         return hm;
     }
+
+    @PostMapping("/follow")
+    public HashMap<String, Object> follow(@RequestParam("ffrom") String ffrom, @RequestParam("fto") String fto){
+        HashMap<String, Object> result = new HashMap<>();
+
+        memberService.onFollow(ffrom, fto);
+        result.put("message", "OK");
+
+        return result;
+    }
 }

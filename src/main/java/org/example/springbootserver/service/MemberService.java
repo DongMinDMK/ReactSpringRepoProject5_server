@@ -71,4 +71,17 @@ public class MemberService {
             return member.get();
         }
     }
+
+    public void onFollow(String ffrom, String fto) {
+        // ffrom 과 fto 로 전달된 값으로 레코드가 있는지 검사
+        Optional<Follow> record = followRepository.findByFfromAndFto(ffrom, fto);
+
+        if(!record.isPresent()){
+            // 레코드가 없는 것이므로 추가
+            Follow follow = new Follow();
+            follow.setFfrom(ffrom);
+            follow.setFto(fto);
+            followRepository.save(follow);
+        }
+    }
 }

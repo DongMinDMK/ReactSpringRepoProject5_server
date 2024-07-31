@@ -156,4 +156,14 @@ public class PostController {
 
         return hm;
     }
+
+    @GetMapping("/getPost/{id}")
+    public HashMap<String, Object> getPost(@PathVariable("id") int id){
+        HashMap<String, Object> hm = new HashMap<>();
+
+
+        hm.put("post", postService.getPost(id));
+
+        return hm;
+    }
 }

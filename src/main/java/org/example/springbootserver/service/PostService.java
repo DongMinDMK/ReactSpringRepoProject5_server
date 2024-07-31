@@ -161,4 +161,13 @@ public class PostService {
     public List<Images> getImgListByPostid(int id) {
         return imagesRepository.findByPostid(id);
     }
+
+    public Post getPost(int id) {
+        Optional<Post> post = postRepository.findById(id);
+        if(post.isPresent()){
+            return post.get();
+        }else{
+            return null;
+        }
+    }
 }
