@@ -1,5 +1,7 @@
 package org.example.springbootserver.service;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import org.example.springbootserver.dao.FollowRepository;
 import org.example.springbootserver.dao.MemberRepository;
 import org.example.springbootserver.entity.Follow;
@@ -82,6 +84,24 @@ public class MemberService {
             follow.setFfrom(ffrom);
             follow.setFto(fto);
             followRepository.save(follow);
+        }
+    }
+
+
+    public void updateMember(Member member) {
+        Optional<Member> member1 = memberRepository.findByNickname(member.getNickname());
+
+        if(member1.isPresent()){
+            Member m = new Member();
+            m.setNickname(member.getNickname());
+            m.setEmail(member.getEmail());
+            m.setPwd(member.getPwd());
+            m.setPhone(member.getPhone());
+            m.setProfileimg(member.getProfileimg());
+            m.setProfilemsg(member.getProfilemsg());
+            memberRepository.save(m);
+        }else{
+            return;
         }
     }
 }

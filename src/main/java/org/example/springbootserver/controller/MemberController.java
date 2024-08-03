@@ -222,4 +222,16 @@ public class MemberController {
 
         return result;
     }
+
+    @PostMapping("/updateMember")
+    public HashMap<String, Object> updateMember(@RequestBody Member member, HttpServletRequest request){
+        HashMap<String, Object> result = new HashMap<>();
+        HttpSession session = request.getSession();
+
+        memberService.updateMember(member);
+        session.setAttribute("loginUser", member );
+        result.put("message", "OK");
+
+        return result;
+    }
 }
